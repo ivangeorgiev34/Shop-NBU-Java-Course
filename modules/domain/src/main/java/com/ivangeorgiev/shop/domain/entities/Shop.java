@@ -47,4 +47,8 @@ public class Shop {
     public List<Item> getUnsoldItems(){
         return this.items.stream().filter(i -> !i.isSold).toList();
     }
+
+    public double income(){
+        return this.items.stream().mapToDouble(i -> i.getPrice()).sum();
+    }
 }
