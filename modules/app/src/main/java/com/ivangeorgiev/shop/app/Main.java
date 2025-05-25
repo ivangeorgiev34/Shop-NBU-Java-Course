@@ -41,7 +41,7 @@ public class Main {
         return new Client(UUID.randomUUID(),balance, name);
     }
 
-    private static void showMainMenu(Scanner scanner, Client client, ShopService shopService){
+    private static void showMainMenu(Scanner scanner, Client client, ShopService shopService) throws Exception{
         while(true){
             System.out.println("\n=== Store Management System ===");
             System.out.println("1. Add money");
@@ -67,10 +67,12 @@ public class Main {
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
+
+            System.out.println("Available balance: " + client.getBalance());
         }
     }
 
-    private static void shop(Scanner scanner, ShopService shopService, Client client){
+    private static void shop(Scanner scanner, ShopService shopService, Client client) throws Exception{
         Random random = new Random();
         int randomIndex = random.nextInt(shopService.getShop().getCashiers().size());
         Cashier cashier = shopService.getShop().getCashiers().get(randomIndex);
@@ -79,37 +81,48 @@ public class Main {
         System.out.println("List of products:");
         shopService.listItems();
 
-        String input = "";
         List<Item> items = new ArrayList<Item>();
-        while(!input.equals("0")){
+        while(true){
             System.out.println("Type the name of the item you want or type 0 if you want to stop choosing items: ");
 
-            input = scanner.next();
-            final String name = input;
+            String name = scanner.next();
+
+            if(name.equals("0")){
+                break;
+            }
 
             if(shopService.getShop().getItems().stream().noneMatch(i -> i.getName().equals(name))){
-                System.out.println("Wrong name");
+                System.out.println("Item with such name does not exist");
                 continue;
             }
 
-            Optional<Item> item = shopService.getShop().getItems().stream().filter(i -> i.getName() == name && !i.getIsSold()).findFirst();
+            Optional<Item> item = shopService.getShop().getItems().stream().filter(i -> i.getName().equals(name) && !i.getIsSold() && !i.isExpired()).findFirst();
+
+            System.out.println("Quantity: ");
+            int quantity = scanner.nextInt();
+
+            if(item.get().getQuantity() - quantity < 0){
+                throw new Exception("Not enough quantity");
+            }
 
             if(client.getBalance() < item.get().finalPrice()){
                 System.out.println("Money is not enough");
                 continue;
             }
 
-            if(item.get().getQuantity() == 0){
-                System.out.println("Item is no longer for sale");
-                item.get().setIsSold(true);
-                continue;
-            }
+            client.setBalance(client.getBalance() - item.get().finalPrice());
 
-            item.get().setQuantity(item.get().getQuantity() - 1);
+            item.get().setQuantity(item.get().getQuantity() - quantity);
+
+            if(item.get().getQuantity() == 0){
+                item.get().setIsSold(true);
+            }
 
             items.add(item.get());
         }
 
-        Bill bill = new Bill(UUID.randomUUID(),cashier,new Date(),items);
+        Bill bill = new Bill(UUID.randomUUID(), cashier, new Date(), items);
+
+        shopService.addBill(bill);
     }
 }
