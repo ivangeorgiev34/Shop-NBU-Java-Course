@@ -126,22 +126,14 @@ public abstract class Item {
     public double finalPrice(){
         long timeDiff = TimeUnit.DAYS.convert(expirationDate.getTime() - new Date().getTime(), TimeUnit.MILLISECONDS);
         boolean isDiscountApplied = timeDiff <=  (long)daysBeforeActiveDiscount && timeDiff > 0;
-        double finalPrice = (this.price + (this.price * (markupPercentage * 0.1)));
+        double finalPrice = this.price - (this.price * (markupPercentage / 100));
 
         return isDiscountApplied
-                ? finalPrice - (finalPrice * (discountPercentage * 0.1))
+                ? finalPrice - (finalPrice * (discountPercentage / 100))
                 : finalPrice;
     }
 
     public boolean isExpired(){
         return this.expirationDate.before(new Date());
-    }
-
-    public void increaseQuantity(){
-        this.quantity++;
-    }
-
-    public void decreaseQuantity(){
-        this.quantity--;
     }
 }
