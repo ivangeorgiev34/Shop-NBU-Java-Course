@@ -27,18 +27,22 @@ public class ShopService {
 
         System.out.println("Please enter a markup percentage that will be applied for all food items in the shop: ");
         double foodItemMarkup = scanner.nextDouble();
+        checkForNonPositiveNumber(foodItemMarkup);
         FoodItem.setMarkupPercentage(foodItemMarkup);
 
         System.out.println("Please enter a markup percentage that will be applied for all non food items in the shop: ");
         double nonFoodItemMarkup = scanner.nextDouble();
+        checkForNonPositiveNumber(nonFoodItemMarkup);
         NonFoodItem.setMarkupPercentage(nonFoodItemMarkup);
 
         System.out.println("Please enter a discount percentage that will be applied for all items in the shop: ");
         double discountPercentage = scanner.nextDouble();
+        checkForNonPositiveNumber(discountPercentage);
         Item.setDiscountPercentage(discountPercentage);
 
         System.out.println("Please enter number of days before expiration date of items when discount will be applied: ");
         int daysBeforeActiveDiscount = scanner.nextInt();
+        checkForNonPositiveNumber(daysBeforeActiveDiscount);
         Item.setDaysBeforeActiveDiscount(daysBeforeActiveDiscount);
 
         System.out.println("Please enter the number of cashiers that the shop will have: ");
@@ -104,8 +108,18 @@ public class ShopService {
     }
 
     public void listItems(){
-        for(Item item : this.shop.getItems()){
+        for(Item item : this.shop.getItems().stream().filter(i -> !i.getIsSold() && !i.isExpired() && i.getQuantity() > 0).toList()){
             System.out.println("Name: " + item.getName());
+        }
+    }
+
+    public void addBill(Bill bill){
+        this.shop.getBills().add(bill);
+    }
+
+    private void checkForNonPositiveNumber(double num) throws NegativeNumberException{
+        if(num <= 0){
+            throw new NegativeNumberException("Cannot enter non-positive number");
         }
     }
 
