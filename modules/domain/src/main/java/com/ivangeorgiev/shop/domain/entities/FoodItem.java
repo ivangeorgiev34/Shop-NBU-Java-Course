@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public class FoodItem extends Item{
 
-    public FoodItem(UUID id, String name, double price, Date expirationDate) {
-        super(id, name, price, expirationDate);
+    public FoodItem(UUID id, String name, double price, Date expirationDate, int quantity) {
+        super(id, name, price, expirationDate, quantity);
     }
 }
