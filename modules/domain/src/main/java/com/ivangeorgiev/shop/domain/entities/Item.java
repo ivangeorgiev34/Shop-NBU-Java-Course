@@ -2,11 +2,16 @@ package com.ivangeorgiev.shop.domain.entities;
 
 import com.ivangeorgiev.shop.domain.exceptions.NegativeNumberException;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public abstract class Item {
+public abstract class Item implements Serializable {
 
     protected Item(UUID id, String name, double price, Date expirationDate, int quantity) {
         this.id = id;
@@ -23,8 +28,6 @@ public abstract class Item {
     protected double price;
 
     protected Date expirationDate;
-
-    protected static double markupPercentage;
 
     protected static double discountPercentage;
 
@@ -48,10 +51,6 @@ public abstract class Item {
 
     public Date getExpirationDate() {
         return expirationDate;
-    }
-
-    public static double getMarkupPercentage() {
-        return markupPercentage;
     }
 
     public static double getDiscountPercentage() {
@@ -91,14 +90,6 @@ public abstract class Item {
         this.expirationDate = expirationDate;
     }
 
-    public static void setMarkupPercentage(double value) throws NegativeNumberException{
-        if(value < 0){
-            throw new NegativeNumberException("Markup percentage cannot be negative");
-        }
-
-        markupPercentage = value;
-    }
-
     public static void setDiscountPercentage(double value) throws NegativeNumberException{
         if(value < 0){
             throw new NegativeNumberException("Markup percentage cannot be negative");
@@ -123,15 +114,7 @@ public abstract class Item {
         this.quantity = quantity;
     }
 
-    public double finalPrice(){
-        long timeDiff = TimeUnit.DAYS.convert(expirationDate.getTime() - new Date().getTime(), TimeUnit.MILLISECONDS);
-        boolean isDiscountApplied = timeDiff <=  (long)daysBeforeActiveDiscount && timeDiff > 0;
-        double finalPrice = this.price - (this.price * (markupPercentage / 100));
-
-        return isDiscountApplied
-                ? finalPrice - (finalPrice * (discountPercentage / 100))
-                : finalPrice;
-    }
+    public abstract double finalPrice(Shop shop);
 
     public boolean isExpired(){
         return this.expirationDate.before(new Date());
