@@ -4,11 +4,17 @@ import java.util.List;
 
 public class Shop {
 
-    public Shop(List<Cashier> cashiers, List<Item> items, List<Bill> bills) {
+    public Shop(List<Cashier> cashiers, List<Item> items, List<Bill> bills, double foodItemsMarkupPercentage, double nonFoodItemsMarkupPercentage) {
         this.cashiers = cashiers;
         this.items = items;
         this.bills = bills;
+        this.foodItemsMarkupPercentage = foodItemsMarkupPercentage;
+        this.nonFoodItemsMarkupPercentage = nonFoodItemsMarkupPercentage;
     }
+
+    private double foodItemsMarkupPercentage;
+
+    private double nonFoodItemsMarkupPercentage;
 
     private List<Cashier> cashiers;
 
@@ -28,6 +34,14 @@ public class Shop {
         return bills;
     }
 
+    public double getFoodItemsMarkupPercentage() {
+        return foodItemsMarkupPercentage;
+    }
+
+    public double getNonFoodItemsMarkupPercentage() {
+        return nonFoodItemsMarkupPercentage;
+    }
+
     public void setCashiers(List<Cashier> cashiers) {
         this.cashiers = cashiers;
     }
@@ -38,6 +52,14 @@ public class Shop {
 
     public void setBills(List<Bill> bills) {
         this.bills = bills;
+    }
+
+    public void setFoodItemsMarkupPercentage(double foodItemsMarkupPercentage) {
+        this.foodItemsMarkupPercentage = foodItemsMarkupPercentage;
+    }
+
+    public void setNonFoodItemsMarkupPercentage(double nonFoodItemsMarkupPercentage) {
+        this.nonFoodItemsMarkupPercentage = nonFoodItemsMarkupPercentage;
     }
 
     public List<Item> getSoldItems(){
