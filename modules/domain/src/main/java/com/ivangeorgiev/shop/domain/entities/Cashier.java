@@ -1,8 +1,9 @@
 package com.ivangeorgiev.shop.domain.entities;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Cashier {
+public class Cashier implements Serializable {
 
     public Cashier(UUID id, String name, double monthlySalary) {
         this.id = id;
