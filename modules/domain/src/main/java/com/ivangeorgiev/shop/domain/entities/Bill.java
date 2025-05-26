@@ -7,16 +7,18 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 public class Bill implements Serializable{
 
-    public Bill(UUID id, Cashier publisher, Date publishedDate, List<Item> items) {
+    public Bill(UUID id, Cashier publisher, Date publishedDate, List<Item> items, HashMap<String, Integer> itemQuantities) {
         this.id = id;
         this.publisher = publisher;
         this.publishedDate = publishedDate;
         this.items = items;
+        this.itemQuantities = itemQuantities;
     }
 
     private UUID id;
@@ -26,6 +28,8 @@ public class Bill implements Serializable{
     private Date publishedDate;
 
     private List<Item> items;
+
+    private HashMap<String, Integer> itemQuantities;
 
     public UUID getId() {
         return id;
@@ -41,6 +45,10 @@ public class Bill implements Serializable{
 
     public List<Item> getItems(){
         return items;
+    }
+
+    public HashMap<String, Integer> getItemQuantities() {
+        return itemQuantities;
     }
 
     public void setId(UUID id) {
@@ -60,7 +68,7 @@ public class Bill implements Serializable{
     }
 
     public double getItemsTotalPrice(Shop shop){
-        return this.items.stream().mapToDouble(p -> p.finalPrice(shop)).sum();
+        return this.items.stream().mapToDouble(p -> p.finalPrice(shop) * itemQuantities.get(p.getName())).sum();
     }
 
     public void saveToFile(Shop shop) throws IOException {
@@ -105,8 +113,9 @@ public class Bill implements Serializable{
         sb.append("----------------------------\n");
 
         for (Item item : items) {
-            sb.append(String.format("%-20s %6.2f\n",
-                    item.getName(), item.finalPrice(shop)));//
+            int quantity = itemQuantities.get(item.getName());
+            sb.append(String.format("%-1s x%-6d %6.2f\n",
+                    item.getName(), quantity, item.finalPrice(shop) * quantity));
         }
 
         sb.append("----------------------------\n");
