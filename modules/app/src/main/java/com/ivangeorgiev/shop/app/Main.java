@@ -110,6 +110,7 @@ public class Main {
         }
 
         List<Item> items = new ArrayList<Item>();
+        HashMap<String, Integer> itemQuantitiesMap = new HashMap<String, Integer>();
 
         while(true){
             System.out.println("Type the name of the item you want or type 0 if you want to stop choosing items: ");
@@ -152,10 +153,16 @@ public class Main {
                 item.get().setIsSold(true);
             }
 
+            if(!itemQuantitiesMap.containsKey(item.get().getName())){
+                itemQuantitiesMap.put(item.get().getName(), 0);
+            }
+
+            itemQuantitiesMap.put(item.get().getName(), itemQuantitiesMap.get(item.get().getName()) + quantity);
+
             items.add(item.get());
         }
 
-        Bill bill = new Bill(UUID.randomUUID(), cashier, new Date(), items);
+        Bill bill = new Bill(UUID.randomUUID(), cashier, new Date(), items, itemQuantitiesMap);
 
         shopService.addBill(bill);
 
