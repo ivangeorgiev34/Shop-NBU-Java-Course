@@ -71,6 +71,6 @@ public class Shop {
     }
 
     public double income(){
-        return this.items.stream().mapToDouble(i -> i.getPrice()).sum();
+        return this.items.stream().mapToDouble(i -> i.finalPrice(this)).sum();
     }
 }
