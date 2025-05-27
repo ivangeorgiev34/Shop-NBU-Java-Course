@@ -63,6 +63,9 @@ public class Main {
             System.out.println("2. Shop");
             System.out.println("3. View a bill");
             System.out.println("4. Add new item to shop");
+            System.out.println("5. View expenses");
+            System.out.println("6. View income");
+            System.out.println("7. View profit");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
 
@@ -84,6 +87,15 @@ public class Main {
                 case 4:
                     itemService.addNewItemToShop(scanner,shopService.getShop());
                     break;
+                case 5:
+                    viewExpenses(shopService);
+                    break;
+                case 6:
+                    viewIncome(shopService);
+                    break;
+                case 7:
+                    viewProfit(shopService);
+                    break;
                 case 0:
                     System.out.println("Exiting the system...");
                     return;
@@ -93,6 +105,24 @@ public class Main {
 
             System.out.println("Available balance: " + client.getBalance());
         }
+    }
+
+    private static void viewIncome(ShopService shopService){
+        double shopExpenses = shopService.getIncome();
+
+        System.out.println("Total income: " + shopExpenses);
+    }
+
+    private static void viewExpenses(ShopService shopService){
+        double shopExpenses = shopService.getExpenses();
+
+        System.out.println("Total expenses: " + shopExpenses);
+    }
+
+    private static void viewProfit(ShopService shopService){
+        double shopProfit = shopService.getProfit();
+
+        System.out.println("Total profit: " + shopProfit);
     }
 
     private static void shop(Scanner scanner, ShopService shopService, Client client) throws Exception{
