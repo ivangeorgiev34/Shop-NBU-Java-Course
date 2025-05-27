@@ -19,6 +19,7 @@ public abstract class Item implements Serializable {
         this.price = price;
         this.expirationDate = expirationDate;
         this.quantity = quantity;
+        this.originalQuantity = quantity;
     }
 
     protected UUID id;
@@ -36,6 +37,8 @@ public abstract class Item implements Serializable {
     protected boolean isSold;
 
     protected int quantity;
+
+    protected int originalQuantity;
 
     public UUID getId() {
         return id;
@@ -67,6 +70,10 @@ public abstract class Item implements Serializable {
 
     public int getQuantity(){
         return quantity;
+    }
+
+    public int getOriginalQuantity(){
+        return originalQuantity;
     }
 
     public void setId(UUID id) {
