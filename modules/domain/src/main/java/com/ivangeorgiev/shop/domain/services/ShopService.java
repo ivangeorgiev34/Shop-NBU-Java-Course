@@ -23,6 +23,65 @@ public class ShopService {
         return shop;
     }
 
+    private double cashierSalariesSum(){
+        return this.shop.getCashiers()
+                .stream()
+                .mapToDouble(Cashier::getMonthlySalary)
+                .sum();
+    }
+
+    private double itemDeliverySum(){
+        return this.shop.getItems()
+                .stream()
+                .mapToDouble(i -> i.getPrice() * i.getOriginalQuantity())
+                .sum();
+    }
+
+    public double getIncome(){
+        double soldItemsSum = this.shop.getBills()
+                .stream()
+                .mapToDouble(b -> {
+                    List<Map.Entry<String, Integer>> entryList =
+                            new ArrayList<>(b.getItemQuantities().entrySet());
+
+                    double sum = 0;
+
+                    for(Map.Entry<String, Integer> entry : entryList){
+
+                        String itemName = entry.getKey();
+                        double itemQuantity = entry.getValue();
+
+                        Optional<Item> currItem = this.shop.getItems()
+                                .stream()
+                                .filter(i -> i.getName().equals(itemName))
+                                .findFirst();
+
+                        if(currItem.isEmpty()){
+                            continue;
+                        }
+
+                        sum += currItem.get().finalPrice(this.shop) * itemQuantity;
+                    }
+
+                    return sum;
+
+                })
+                .sum();
+
+        return soldItemsSum;
+    }
+
+    public double getExpenses(){
+        double cashierSalariesSum = cashierSalariesSum();
+        double itemDeliverySum = itemDeliverySum();
+
+        return cashierSalariesSum + itemDeliverySum;
+    }
+
+    public double getProfit(){
+        return getIncome() - getExpenses();
+    }
+
     public void createShop(Scanner scanner) throws NegativeNumberException, ParseException, Exception {
         System.out.println("Please enter a discount percentage that will be applied for all items in the shop: ");
         double discountPercentage = scanner.nextDouble();
