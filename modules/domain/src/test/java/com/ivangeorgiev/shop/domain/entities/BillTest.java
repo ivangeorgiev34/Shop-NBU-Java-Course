@@ -30,8 +30,26 @@ public class BillTest {
 
         bill.serialize(path);
 
-        File file = new File("src/test/java/com/ivangeorgiev/shop/domain/entities/" + fileName);
+        String filePath = path.toString() + "/" + fileName;
+
+        File file = new File(filePath);
         Assertions.assertTrue(file.exists());
+
+        file.delete();
+    }
+
+    @Test
+    public void deserialize_shouldDeserialize() throws IOException, ClassNotFoundException {
+        String fileName = "receipt_" + bill.getId() + ".bin";
+        Path path = Path.of("src", "test", "java", "com", "ivangeorgiev", "shop", "domain", "entities");
+
+        String filePath = path.toString() + "/" + fileName;
+        File file = new File(filePath);
+
+        bill.serialize(path);
+        Bill deserializedBill = bill.deserialize(path);
+
+        Assertions.assertEquals(bill.getId().toString(), deserializedBill.getId().toString());
 
         file.delete();
     }
