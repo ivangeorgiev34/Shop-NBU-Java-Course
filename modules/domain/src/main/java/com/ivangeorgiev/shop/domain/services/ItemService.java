@@ -15,7 +15,7 @@ public class ItemService {
         return isFoodItem ? new FoodItem(id, name, price, expirationDate, quantity) : new NonFoodItem(id, name, price, expirationDate, quantity);
     }
 
-    public void addNewItemToShop(Scanner scanner, Shop shop) throws Exception{
+        public void addNewItemToShop(Scanner scanner, Shop shop) throws Exception{
         System.out.println("Name: ");
         String name = scanner.next();
 
