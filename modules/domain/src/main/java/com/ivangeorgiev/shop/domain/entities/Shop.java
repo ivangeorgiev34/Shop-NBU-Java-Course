@@ -4,12 +4,10 @@ import java.util.List;
 
 public class Shop {
 
-    public Shop(List<Cashier> cashiers, List<Item> items, List<Bill> bills, double foodItemsMarkupPercentage, double nonFoodItemsMarkupPercentage) {
+    public Shop(List<Cashier> cashiers, List<Item> items, List<Bill> bills) {
         this.cashiers = cashiers;
         this.items = items;
         this.bills = bills;
-        this.foodItemsMarkupPercentage = foodItemsMarkupPercentage;
-        this.nonFoodItemsMarkupPercentage = nonFoodItemsMarkupPercentage;
     }
 
     private double foodItemsMarkupPercentage;
