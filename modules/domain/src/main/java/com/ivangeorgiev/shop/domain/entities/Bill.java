@@ -84,8 +84,8 @@ public class Bill implements Serializable{
         serialize(filePath.getParent());
     }
 
-    public Bill deserialize() throws IOException, ClassNotFoundException{
-        Path filePath = Paths.get("modules","domain", "src", "main", "resources", "bills", "receipt_" + id + ".bin").toAbsolutePath();
+    public Bill deserialize(Path path) throws IOException, ClassNotFoundException{
+        Path filePath = path.resolve("receipt_" + id + ".bin");
 
         try (ObjectInputStream ois = new ObjectInputStream(
                 Files.newInputStream(filePath))) {
