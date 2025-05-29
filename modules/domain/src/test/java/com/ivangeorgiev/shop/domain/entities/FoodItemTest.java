@@ -21,7 +21,9 @@ public class FoodItemTest {
     @BeforeEach
     public void setup() throws NegativeNumberException{
         this.foodItem = new FoodItem(UUID.fromString(foodItemId), "burger", 50, new Date(),3);
-        this.shop = new Shop(new ArrayList<Cashier>(), new ArrayList<Item>(), new ArrayList<Bill>(),50,50);
+        this.shop = new Shop(new ArrayList<Cashier>(), new ArrayList<Item>(), new ArrayList<Bill>());
+        this.shop.setFoodItemsMarkupPercentage(50);
+        this.shop.setNonFoodItemsMarkupPercentage(50);
         FoodItem.setDiscountPercentage(50);
     }
 
