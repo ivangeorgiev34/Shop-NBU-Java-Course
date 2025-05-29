@@ -3,11 +3,14 @@ package com.ivangeorgiev.shop.app;
 import com.ivangeorgiev.shop.domain.entities.*;
 import com.ivangeorgiev.shop.domain.exceptions.NegativeNumberException;
 import com.ivangeorgiev.shop.domain.services.CashierService;
+import com.ivangeorgiev.shop.domain.services.ClientService;
 import com.ivangeorgiev.shop.domain.services.ItemService;
 import com.ivangeorgiev.shop.domain.services.ShopService;
 import com.ivangeorgiev.shop.domain.utils.Utils;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -16,9 +19,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class Main {
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final ItemService itemService = new ItemService();
+    private static final CashierService cashierService = new CashierService();
+    private static final Shop shop = new Shop(new ArrayList<Cashier>(),new ArrayList<Item>(), new ArrayList<Bill>());
+    private static final ShopService shopService = new ShopService(shop, cashierService, itemService);
+    private static final ClientService clientService = new ClientService();
+
     public static void main(String[] args) {
         try {
-            Scanner scanner = new Scanner(System.in);
             System.out.println("Hello! Please create a shop first!");
 
             System.out.println("Please enter a markup percentage that will be applied for all food items in the shop: ");
@@ -29,13 +38,10 @@ public class Main {
             double nonFoodItemMarkup = scanner.nextDouble();
             Utils.checkForNonPositiveNumber(nonFoodItemMarkup);
 
-            ItemService itemService = new ItemService();
-            ShopService shopService = new ShopService(new Shop(new ArrayList<Cashier>(),new ArrayList<Item>(), new ArrayList<Bill>(), foodItemMarkup, nonFoodItemMarkup),new CashierService(), itemService);
-
             shopService.createShop(scanner);
-            Client client = registerClient(scanner);
+            Client client = clientService.createClient(scanner);
 
-            showMainMenu(scanner, client, shopService, itemService);
+            showMainMenu(client);
 
         } catch(InputMismatchException exc){
             System.out.println("Incorrect form of input data");
@@ -44,21 +50,9 @@ public class Main {
         }
     }
 
-    private static Client registerClient(Scanner scanner){
-        System.out.println("Now a client is need to be created, so please enter your information: ");
-
-        System.out.println("Client name: ");
-        String name = scanner.next();
-
-        System.out.println("Client balance: ");
-        double balance = scanner.nextDouble();
-
-        return new Client(UUID.randomUUID(),balance, name);
-    }
-
-    private static void showMainMenu(Scanner scanner, Client client, ShopService shopService, ItemService itemService) throws Exception{
+    private static void showMainMenu(Client client) throws Exception{
         while(true){
-            System.out.println("\n=== Store Management System ===");
+            System.out.println("\nChoose ");
             System.out.println("1. Add money to client's account");
             System.out.println("2. Shop");
             System.out.println("3. View a bill");
@@ -79,22 +73,22 @@ public class Main {
                     client.setBalance(client.getBalance() + balance);
                     break;
                 case 2:
-                    shop(scanner, shopService, client);
+                    shop(client);
                     break;
                 case 3:
-                    viewBill(scanner, shopService, client);
+                    viewBill(client);
                     break;
                 case 4:
-                    itemService.addNewItemToShop(scanner,shopService.getShop());
+                    itemService.addNewItemToShop(scanner, shopService.getShop());
                     break;
                 case 5:
-                    viewExpenses(shopService);
+                    viewExpenses();
                     break;
                 case 6:
-                    viewIncome(shopService);
+                    viewIncome();
                     break;
                 case 7:
-                    viewProfit(shopService);
+                    viewProfit();
                     break;
                 case 0:
                     System.out.println("Exiting the system...");
@@ -103,29 +97,29 @@ public class Main {
                     System.out.println("Invalid choice. Please try again.");
             }
 
-            System.out.println("Available balance: " + client.getBalance());
+            System.out.println("Client balance: " + client.getBalance());
         }
     }
 
-    private static void viewIncome(ShopService shopService){
+    private static void viewIncome(){
         double shopExpenses = shopService.getIncome();
 
         System.out.println("Total income: " + shopExpenses);
     }
 
-    private static void viewExpenses(ShopService shopService){
+    private static void viewExpenses(){
         double shopExpenses = shopService.getExpenses();
 
         System.out.println("Total expenses: " + shopExpenses);
     }
 
-    private static void viewProfit(ShopService shopService){
+    private static void viewProfit(){
         double shopProfit = shopService.getProfit();
 
         System.out.println("Total profit: " + shopProfit);
     }
 
-    private static void shop(Scanner scanner, ShopService shopService, Client client) throws Exception{
+    private static void shop(Client client) throws Exception{
         Random random = new Random();
         int randomIndex = random.nextInt(shopService.getShop().getCashiers().size());
         Cashier cashier = shopService.getShop().getCashiers().get(randomIndex);
@@ -199,7 +193,7 @@ public class Main {
         bill.saveToFile(shopService.getShop());
     }
 
-    private static void viewBill(Scanner scanner, ShopService shopService, Client client) throws IOException, ClassNotFoundException {
+    private static void viewBill(Client client) throws IOException, ClassNotFoundException {
         System.out.println("Please choose the number of bill you want to view");
 
         int num = 1;
@@ -211,7 +205,11 @@ public class Main {
         }
 
         int choice = scanner.nextInt();
-        Bill deserialized = map.get(choice).deserialize();
+
+        Bill selectedBill = map.get(choice);
+        Path filePath = Paths.get("modules","domain", "src", "main", "resources", "bills", "receipt_" + selectedBill.getId() + ".bin").toAbsolutePath();
+
+        Bill deserialized = map.get(choice).deserialize(filePath);
 
         System.out.println(deserialized.generateReceiptText(shopService.getShop()));
     }
